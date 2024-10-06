@@ -54,14 +54,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import ImagePreview from '@/components/ImagePreview.vue'
+import { useDebounceFn } from '@vueuse/core' // Import debounce function
 
 const photoList = ref([]) // For storing the photos (either default or search)
 const searchQuery = ref('') // Start with an empty search query
 const showPreview = ref(false) // Preview modal state
 const preview = ref({}) // Preview data
+const debouncedSearch = useDebounceFn(() => searchPhotos(), 500) // Debounce searchPhotos function
 
 // Function to fetch the latest African photos
 const getLatestAfricanPhotos = async () => {
@@ -81,7 +83,8 @@ const getLatestAfricanPhotos = async () => {
 
 // Function to fetch photos based on user search
 const searchPhotos = async () => {
-  const params = { query: searchQuery.value, per_page: 8 }
+  if (!searchQuery.value) return // Avoid making a request for an empty search
+  const params = { query: `${searchQuery.value} africa`, per_page: 8 }
   try {
     const { data } = await axios.get('https://api.unsplash.com/search/photos', {
       params,
@@ -94,6 +97,11 @@ const searchPhotos = async () => {
     console.error('Error fetching photos:', error)
   }
 }
+
+// Watch the searchQuery and call the debounced search function
+watch(searchQuery, () => {
+  debouncedSearch()
+})
 
 // Function to get background style for the photo list item
 const backgroundStyle = (url) => {
