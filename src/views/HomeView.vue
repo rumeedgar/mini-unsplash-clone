@@ -10,16 +10,16 @@
       </template>
 
       <form v-else class="header-search" @submit.prevent="handleSearch">
-        <img class="header-icon" src="@/assets/search-icon.svg" />
+        <img class="header-icon" src="@/assets/search-icon.svg" alt="Search icon" />
         <input v-model="searchInput" class="header-input" placeholder="Search for photo" />
       </form>
     </header>
     <main class="main-content">
       <div class="photo-list">
-        <template v-if="photoList.length">
+        <template v-if="!loading && photoList.length">
           <div
-            v-for="(photo, index) in photoList"
-            :key="index"
+            v-for="photo in photoList"
+            :key="photo.id"
             class="photo-list-item"
             @click.prevent="previewPhoto(photo)"
             :style="backgroundStyle(photo.urls.regular)"
@@ -34,7 +34,7 @@
         </template>
 
         <!-- Placeholder loading items -->
-        <template v-else>
+        <template v-else-if="loading">
           <div v-for="index in 6" :key="index" class="photo-list-item">
             <div class="photo-placeholder">
               <div class="photo-info">
@@ -44,6 +44,8 @@
             </div>
           </div>
         </template>
+
+        <p v-else>No photos found.</p>
       </div>
     </main>
 
@@ -54,58 +56,30 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { usePhotoSearch } from '@/composables/usePhotoSearch'
 import ImagePreview from '@/components/ImagePreview.vue'
 
-const photoList = ref([])
-const searchInput = ref('')
-const searchQuery = ref('')
-const showSearchResults = ref(false)
+const {
+  photoList,
+  searchInput,
+  searchQuery,
+  showSearchResults,
+  loading,
+  getLatestAfricanPhotos,
+  searchPhotos
+} = usePhotoSearch()
+
 const showPreview = ref(false)
 const preview = ref({})
-
-const getLatestAfricanPhotos = async () => {
-  const params = { query: 'africa', per_page: 8, order_by: 'latest' }
-  try {
-    const { data } = await axios.get('https://api.unsplash.com/search/photos', {
-      params,
-      headers: {
-        Authorization: `Client-ID Mx3V9s3sOQLwOVKZoFOAEo3pt50XlwvqLmABR1to__8`
-      }
-    })
-    photoList.value = data.results
-  } catch (error) {
-    console.error('Error fetching latest African photos:', error)
-  }
-}
-
-const searchPhotos = async () => {
-  if (!searchQuery.value) return
-  const params = { query: `${searchQuery.value} africa`, per_page: 8 }
-  try {
-    const { data } = await axios.get('https://api.unsplash.com/search/photos', {
-      params,
-      headers: {
-        Authorization: `Client-ID Mx3V9s3sOQLwOVKZoFOAEo3pt50XlwvqLmABR1to__8`
-      }
-    })
-    photoList.value = data.results
-    showSearchResults.value = true
-  } catch (error) {
-    console.error('Error fetching photos:', error)
-  }
-}
 
 const handleSearch = () => {
   searchQuery.value = searchInput.value
   searchPhotos()
 }
 
-const backgroundStyle = (url) => {
-  return {
-    backgroundImage: `url(${url})`
-  }
-}
+const backgroundStyle = (url) => ({
+  backgroundImage: `url(${url})`
+})
 
 const previewPhoto = (photo) => {
   preview.value = photo
@@ -123,9 +97,7 @@ const resetSearch = () => {
   getLatestAfricanPhotos()
 }
 
-onMounted(() => {
-  getLatestAfricanPhotos()
-})
+onMounted(getLatestAfricanPhotos)
 </script>
 
 <style scoped lang="scss">
