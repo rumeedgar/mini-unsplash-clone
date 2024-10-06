@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <header class="header">
-      <template v-if="searchQuery">
+      <template v-if="showSearchResults">
         <button class="back-button" @click="resetSearch">Go back</button>
         <h1 class="header-search-title">
           Search Results for &quot;<span class="search-query">{{ searchQuery }}</span
@@ -9,12 +9,11 @@
         </h1>
       </template>
 
-      <form class="header-search" @submit.prevent="searchPhotos" v-else>
+      <form v-else class="header-search" @submit.prevent="handleSearch">
         <img class="header-icon" src="@/assets/search-icon.svg" />
-        <input v-model="searchQuery" class="header-input" placeholder="Search for photo" />
+        <input v-model="searchInput" class="header-input" placeholder="Search for photo" />
       </form>
     </header>
-
     <main class="main-content">
       <div class="photo-list">
         <template v-if="photoList.length">
@@ -54,80 +53,76 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import ImagePreview from '@/components/ImagePreview.vue'
-import { useDebounceFn } from '@vueuse/core' // Import debounce function
 
-const photoList = ref([]) // For storing the photos (either default or search)
-const searchQuery = ref('') // Start with an empty search query
-const showPreview = ref(false) // Preview modal state
-const preview = ref({}) // Preview data
-const debouncedSearch = useDebounceFn(() => searchPhotos(), 500) // Debounce searchPhotos function
+const photoList = ref([])
+const searchInput = ref('')
+const searchQuery = ref('')
+const showSearchResults = ref(false)
+const showPreview = ref(false)
+const preview = ref({})
 
-// Function to fetch the latest African photos
 const getLatestAfricanPhotos = async () => {
   const params = { query: 'africa', per_page: 8, order_by: 'latest' }
   try {
     const { data } = await axios.get('https://api.unsplash.com/search/photos', {
       params,
       headers: {
-        Authorization: `Client-ID Mx3V9s3sOQLwOVKZoFOAEo3pt50XlwvqLmABR1to__8` // Hardcoded access key
+        Authorization: `Client-ID Mx3V9s3sOQLwOVKZoFOAEo3pt50XlwvqLmABR1to__8`
       }
     })
-    photoList.value = data.results // Store the results in the photoList
+    photoList.value = data.results
   } catch (error) {
     console.error('Error fetching latest African photos:', error)
   }
 }
 
-// Function to fetch photos based on user search
 const searchPhotos = async () => {
-  if (!searchQuery.value) return // Avoid making a request for an empty search
+  if (!searchQuery.value) return
   const params = { query: `${searchQuery.value} africa`, per_page: 8 }
   try {
     const { data } = await axios.get('https://api.unsplash.com/search/photos', {
       params,
       headers: {
-        Authorization: `Client-ID Mx3V9s3sOQLwOVKZoFOAEo3pt50XlwvqLmABR1to__8` // Hardcoded access key
+        Authorization: `Client-ID Mx3V9s3sOQLwOVKZoFOAEo3pt50XlwvqLmABR1to__8`
       }
     })
-    photoList.value = data.results // Store search results in the photoList
+    photoList.value = data.results
+    showSearchResults.value = true
   } catch (error) {
     console.error('Error fetching photos:', error)
   }
 }
 
-// Watch the searchQuery and call the debounced search function
-watch(searchQuery, () => {
-  debouncedSearch()
-})
+const handleSearch = () => {
+  searchQuery.value = searchInput.value
+  searchPhotos()
+}
 
-// Function to get background style for the photo list item
 const backgroundStyle = (url) => {
   return {
     backgroundImage: `url(${url})`
   }
 }
 
-// Handle image preview
 const previewPhoto = (photo) => {
   preview.value = photo
   showPreview.value = true
 }
 
-// Close preview modal
 const closePreview = () => {
   showPreview.value = false
 }
 
-// Reset search and reload default African photos
 const resetSearch = () => {
+  searchInput.value = ''
   searchQuery.value = ''
-  getLatestAfricanPhotos() // Reload latest African photos
+  showSearchResults.value = false
+  getLatestAfricanPhotos()
 }
 
-// Fetch latest African photos on component mount
 onMounted(() => {
   getLatestAfricanPhotos()
 })
