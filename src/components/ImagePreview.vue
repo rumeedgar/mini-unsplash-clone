@@ -20,7 +20,6 @@
 </template>
 
 <script>
-// Script remains unchanged
 import { onMounted, onBeforeUnmount } from 'vue'
 
 export default {
