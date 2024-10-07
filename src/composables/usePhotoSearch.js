@@ -1,7 +1,7 @@
 import { ref, onMounted } from 'vue'
 import axiosInstance from '@/utils/axios'
 import { useCache } from '@/composables/useCache'
-import debounce from 'lodash/debounce'
+// import debounce from 'lodash/debounce'
 
 export function usePhotoSearch() {
   const photoList = ref([])
@@ -18,13 +18,13 @@ export function usePhotoSearch() {
     prefetchCommonSearches()
   })
 
-  const debouncedSearch = debounce(() => {
-    if (searchInput.value.trim()) {
-      searchQuery.value = searchInput.value
-      page.value = 1
-      searchPhotos()
-    }
-  }, 300)
+  // const debouncedSearch = debounce(() => {
+  //   if (searchInput.value.trim()) {
+  //     searchQuery.value = searchInput.value
+  //     page.value = 1
+  //     searchPhotos()
+  //   }
+  // }, 300)
 
   const getLatestAfricanPhotos = async () => {
     loading.value = true
@@ -134,6 +134,6 @@ export function usePhotoSearch() {
     searchPhotos,
     loadMore,
     handleSearch,
-    debouncedSearch
+    // debouncedSearch
   }
 }
