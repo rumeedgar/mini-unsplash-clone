@@ -6,10 +6,16 @@
       :search-input="searchInput"
       @reset-search="resetSearch"
       @search="handleSearch"
-      @update:searchInput="searchInput = $event"
+      @update:searchInput="updateSearchInput"
     />
     <main class="main-content">
-      <PhotoList :photos="photoList" :loading="loading" @preview="previewPhoto" />
+      <PhotoList
+        :photos="photoList"
+        :loading="loading"
+        :has-more="hasMore"
+        @preview="previewPhoto"
+        @load-more="loadMore"
+      />
     </main>
     <ImagePreview v-if="showPreview" :preview="preview" @close="closePreview" />
   </div>
@@ -26,21 +32,17 @@ const {
   photoList,
   searchInput,
   searchQuery,
-  showSearchResults,
   loading,
+  showSearchResults,
+  hasMore,
   getLatestAfricanPhotos,
-  searchPhotos,
-  handleSearch: composableHandleSearch,
-  // debouncedSearch,
-  resetSearch: composableResetSearch
+  handleSearch,
+  loadMore,
+  resetSearch
 } = usePhotoSearch()
 
 const showPreview = ref(false)
 const preview = ref({})
-
-const handleSearch = () => {
-  composableHandleSearch()
-}
 
 const previewPhoto = (photo) => {
   preview.value = photo
@@ -51,8 +53,8 @@ const closePreview = () => {
   showPreview.value = false
 }
 
-const resetSearch = () => {
-  composableResetSearch()
+const updateSearchInput = (value) => {
+  searchInput.value = value
 }
 
 onMounted(getLatestAfricanPhotos)
