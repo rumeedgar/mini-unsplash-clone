@@ -4,7 +4,7 @@
       <div class="search-header">
         <button class="back-button" @click="$emit('reset-search')">Go back</button>
         <h1 class="header-search-title">
-          {{ `Search Results for "${searchQuery}"` }}
+          {{ loading ? `Searching for "${searchQuery}"` : `Search Results for "${searchQuery}"` }}
         </h1>
       </div>
     </template>
