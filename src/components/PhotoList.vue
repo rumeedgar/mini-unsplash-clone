@@ -62,6 +62,7 @@ const backgroundStyle = computed(() => (url) => ({
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    position: relative; // Added for positioning the overlay
 
     &:nth-child(n) {
       grid-row-end: span 8;
@@ -97,12 +98,32 @@ const backgroundStyle = computed(() => (url) => ({
     .photo-info {
       color: #ffffff;
       padding: 20px;
+      position: relative; // Added for z-index
+      z-index: 2; // Ensure text is above the overlay
     }
   }
 
   .photo-overlay {
     cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.2);
+    position: absolute; // Position the overlay
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.5) 100%
+    ); // Gradient overlay for better contrast
+    transition: background 0.3s ease; // Smooth transition for hover effect
+
+    &:hover {
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.6) 100%
+      ); // Darker overlay on hover
+    }
   }
 
   .photo-placeholder {
