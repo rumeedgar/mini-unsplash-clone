@@ -1,11 +1,12 @@
 <template>
   <header class="header">
     <template v-if="showSearchResults">
-      <button class="back-button" @click="$emit('reset-search')">Go back</button>
-      <h1 class="header-search-title">
-        Search Results for "<span class="search-query">{{ searchQuery }}</span
-        >"
-      </h1>
+      <div class="search-header">
+        <button class="back-button" @click="$emit('reset-search')">Go back</button>
+        <h1 class="header-search-title">
+          {{ `Search Results for "${searchQuery}"` }}
+        </h1>
+      </div>
     </template>
     <form v-else class="header-search" @submit.prevent="$emit('search')">
       <img class="header-icon" src="@/assets/search-icon.svg" alt="Search icon" />
@@ -23,7 +24,8 @@
 defineProps({
   showSearchResults: Boolean,
   searchQuery: String,
-  searchInput: String
+  searchInput: String,
+  loading: Boolean
 })
 
 defineEmits(['reset-search', 'search', 'update:searchInput'])
@@ -41,6 +43,7 @@ defineEmits(['reset-search', 'search', 'update:searchInput'])
     background: none;
     font-size: 16px;
     color: var(--secondary-color);
+    cursor: pointer;
   }
 
   .header-search-title {

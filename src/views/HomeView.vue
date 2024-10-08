@@ -4,6 +4,7 @@
       :show-search-results="showSearchResults"
       :search-query="searchQuery"
       :search-input="searchInput"
+      :loading="loading"
       @reset-search="resetSearch"
       @search="handleSearch"
       @update:searchInput="updateSearchInput"
