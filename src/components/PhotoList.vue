@@ -122,8 +122,6 @@ const backgroundStyle = computed(() => (url) => ({
       padding: 20px;
       position: relative;
       z-index: 2;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
     }
   }
 
@@ -139,10 +137,6 @@ const backgroundStyle = computed(() => (url) => ({
 
     &:hover {
       background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%);
-
-      .photo-info {
-        transform: translateY(0);
-      }
     }
   }
 
@@ -178,25 +172,34 @@ const backgroundStyle = computed(() => (url) => ({
 
 .photo-info-name,
 .photo-info-location {
-  opacity: 0;
+  opacity: 1;
+  transform: translateY(0);
   transition:
     opacity 0.3s ease,
     transform 0.3s ease;
 }
 
-.photo-overlay:hover {
+@media (hover: hover) and (pointer: fine) {
   .photo-info-name,
   .photo-info-location {
-    opacity: 1;
-    transform: translateY(-5px);
+    opacity: 0;
+    transform: translateY(5px);
   }
 
-  .photo-info-name {
-    transition-delay: 0.1s;
-  }
+  .photo-overlay:hover {
+    .photo-info-name,
+    .photo-info-location {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-  .photo-info-location {
-    transition-delay: 0.2s;
+    .photo-info-name {
+      transition-delay: 0.1s;
+    }
+
+    .photo-info-location {
+      transition-delay: 0.2s;
+    }
   }
 }
 </style>
