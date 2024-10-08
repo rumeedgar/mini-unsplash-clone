@@ -123,6 +123,15 @@ export function usePhotoSearch() {
     }
   }
 
+  const resetSearch = () => {
+    searchInput.value = ''
+    searchQuery.value = ''
+    showSearchResults.value = false
+    page.value = 1
+    hasMore.value = true
+    getLatestAfricanPhotos()
+  }
+
   return {
     photoList,
     searchInput,
@@ -134,6 +143,7 @@ export function usePhotoSearch() {
     searchPhotos,
     loadMore,
     handleSearch,
+    resetSearch
     // debouncedSearch
   }
 }
